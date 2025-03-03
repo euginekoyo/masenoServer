@@ -1,31 +1,27 @@
 import express from "express";
 import bodyParser from "body-parser";
-import authRoutes from "./routes/authRoutes.js";
-import blogRoutes from "./routes/blogRoutes.js";
-import profRoutes from "./routes/profRoutes.js";
-import sequelize from "./config/db.js"; // Your Sequelize connection
 import cors from "cors";
 import path from "path";
+import connectDB  from "./config/db.js";
+import userRoutes from "./routes/userRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
+import serviceRoutes from "./routes/serviceRoutes.js";
+
 const app = express();
 
 // Middleware
-app.use(
-  cors({
-    origin: "*", // Allow requests from the frontend
-  })
-);
+app.use(cors({ origin: "*" }));
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/blog", blogRoutes);
-app.use("/api/profile", profRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/services", serviceRoutes);
 
-// Test the database connection and start the server
-sequelize
-  .sync()
+// Connect to MongoDB and Start Server
+connectDB()
   .then(() => {
     app.listen(5000, () => {
       console.log("Server is running on port 5000");
