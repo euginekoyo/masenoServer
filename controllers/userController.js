@@ -30,39 +30,34 @@ export const signup = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
   try {
-    const user = await User.findOne({ email });
+    const { email, password } = req.body;
+
+    // Find user by email
+    const user = await User.findOne({ where: { email } });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password); // ✅ Compare plain text vs hashed password
+
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      "your_jwt_secret",
-      { expiresIn: "1h" }
-    );
-
-    return res.status(200).json({
-      message: "Login successful",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+    // Generate JWT token
+    const token = jwt.sign({ id: user.id, email: user.email }, "your_jwt_secret", {
+      expiresIn: "1h",
     });
+
+    res.json({ token, user });
   } catch (error) {
-    return res.status(500).json({ message: "Error logging in", error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
+
 
 export const fetchUsers = async (req, res) => {
   try {
