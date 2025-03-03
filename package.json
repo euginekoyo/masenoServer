@@ -19,11 +19,12 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.11.0",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.12.0",
     "nodemon": "^3.1.9",
     "sequelize": "^6.37.5",
-    "socket.io": "^4.8.1",
+    ".iosocket": "^4.8.1",
     "socket.io-client": "^4.8.1"
   }
 }

@@ -1,35 +1,24 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/db.js"; // Your sequelize instance
-
-export const User = sequelize.define(
-  "Users",
+import mongoose from "mongoose";
+const userSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-      allowNull: false,
-    },
     name: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     email: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
       unique: true,
-      validate: {
-        isEmail: true,
-      },
+      match: [/^\S+@\S+\.\S+$/, "Please enter a valid email address"],
     },
     password: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     role: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: "user", // Set default role
+      type: String,
+      required: true,
+      default: "user",
     },
   },
   {
@@ -37,4 +26,5 @@ export const User = sequelize.define(
   }
 );
 
-await User.sync(); // Create the table if it doesn't exist
+const User = mongoose.model("User", userSchema);
+export { User };
