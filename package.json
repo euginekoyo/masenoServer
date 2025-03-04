@@ -27,7 +27,7 @@
     "mysql2": "^3.12.0",
     "nodemon": "^3.1.9",
     "sequelize": "^6.37.5",
-    "sharp": "^0.33.5",
+    ".iosocket": "^4.8.1",
     "socket.io-client": "^4.8.1"
   }
 }
