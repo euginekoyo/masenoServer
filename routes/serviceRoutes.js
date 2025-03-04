@@ -1,11 +1,20 @@
 import express from "express";
-import { createService, getServices, getServiceById, updateService, deleteService } from "../controllers/serviceController.js";
+import { upload } from "../config/cloudinary.js";
+import {
+  createService,
+  getServices,
+  getServiceById,
+  updateService,
+  deleteService,
+} from "../controllers/serviceController.js";
 
 const router = express.Router();
 
-router.post("/services", createService);
-router.get("/services", getServices);
-router.get("/services/:id", getServiceById);
-router.put("/services/:id", updateService);
-router.delete("/services/:id", deleteService);
+// Service Routes
+router.post("/", upload.single("image"), createService);
+router.get("/", getServices);
+router.get("/:id", getServiceById);
+router.put("/:id", upload.single("image"), updateService);
+router.delete("/:id", deleteService);
+
 export default router;

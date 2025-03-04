@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
-const productSchema = new mongoose.Schema(
+
+const { Schema } = mongoose;
+
+const productSchema = new Schema(
   {
-    name: {
+    title: {
       type: String,
       required: true,
     },
@@ -13,14 +16,44 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    image: {
-      type: String, // Store image URL or path
+    phoneNumber: {
+      type: String,
       required: true,
     },
+    category: {
+      type: String,
+      required: true,
+    },
+    brand: {
+      type: String,
+      required: true,
+    },
+    stockQuantity: {
+      type: Number,
+      required: true,
+    },
+    thumbnail: {
+      type: String,
+      required: true,
+    },
+    images: {
+      type: [String],
+      required: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true, versionKey: false }
 );
+
+// Add indexes for faster queries
+productSchema.index({ title: 1 });
+productSchema.index({ category: 1 });
+productSchema.index({ brand: 1 });
+productSchema.index({ price: 1 });
+
 const Product = mongoose.model("Product", productSchema);
-export { Product };
+
+export default Product;

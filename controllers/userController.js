@@ -13,63 +13,88 @@ export const signup = async (req, res) => {
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     // Create a new user
     const newUser = new User({
       name,
       email,
+
       password: hashedPassword,
-      role: role || "user", // Default role
+      role: role || "buyer", // Default role
     });
+    
+    const token = jwt.sign(
+      {
+        userId: newUser._id,
+        name: newUser.name,
+        email:newUser.email,
+        role: newUser.role,
+      },
+      process.env.JWT_SECRET || "your_jwt_secret", // Use env variable for security
+      { expiresIn: "1h" }
+    );
     await newUser.save();
 
-    return res.status(200).json({ message: "User registered successfully", newUser });
+    return res
+      .status(200)
+      .json({ message: "User registered successfully", newUser ,token});
   } catch (error) {
-    return res.status(500).json({ message: "Error creating user", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Error creating user", error: error.message });
   }
 };
 
 export const login = async (req, res) => {
+  console.log("Login request received:", req.body); // Debug: Check request body
+
   const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ message: "Missing email or password" });
+  }
+
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    // console.log("User found in DB:", user); // Debug: Check if user is retrieved
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+    // console.log("Password match result:", isMatch); // Debug: Check password comparison
+
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid password" });
     }
 
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      "your_jwt_secret",
-      { expiresIn: "1h" }
-    );
-
-    return res.status(200).json({
-      message: "Login successful",
-      token,
-      user: {
-        id: user._id,
+      {
+        userId: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
       },
-    });
+
+      process.env.JWT_SECRET, // Use env variable for security
+      { expiresIn: "1h" }
+    );
+    res.status(200).json({ message: "Login successful"});
   } catch (error) {
-    return res.status(500).json({ message: "Error logging in", error: error.message });
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
 export const fetchUsers = async (req, res) => {
   try {
-    const users = await User.find({}, "_id name email"); // Select only necessary fields
+
+    const users = await User.find({}, "_id name email role"); // Select only necessary fields
     return res.status(200).json(users);
   } catch (error) {
-    return res.status(500).json({ message: "Error fetching users", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Error fetching users", error: error.message });
   }
 };
 
@@ -88,8 +113,12 @@ export const updateUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    return res.status(200).json({ message: "User updated successfully", updatedUser });
+    return res
+      .status(200)
+      .json({ message: "User updated successfully", updatedUser });
   } catch (error) {
-    return res.status(500).json({ message: "Error updating user", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Error updating user", error: error.message });
   }
 };

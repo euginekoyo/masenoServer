@@ -2,10 +2,12 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import path from "path";
-import connectDB  from "./config/db.js";
+import morgan from "morgan"; // Import Morgan for logging
+import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
+import authRoutes from "./routes/authRoutes.js"; // Import auth routes
 
 const app = express();
 
@@ -15,8 +17,21 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
+// Morgan Middleware to log requests
+app.use(
+  morgan((tokens, req, res) => {
+    return [
+      tokens.method(req, res), // GET, POST, PUT, etc.
+      tokens.url(req, res), // Request URL
+      res.statusCode, // Response status code
+      tokens["response-time"](req, res) + " ms", // Response time
+    ].join(" | ");
+  })
+);
+
 // Routes
-app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes); // Use auth routes
+app.use("/api/auth", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/services", serviceRoutes);
 
