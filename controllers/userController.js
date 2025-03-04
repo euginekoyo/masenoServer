@@ -14,6 +14,7 @@ export const signup = async (req, res) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+
     // Create a new user
     const newUser = new User({
       name,
@@ -37,7 +38,7 @@ export const signup = async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "User registered successfully", newUser ,token});
+      .json({ message: "User registered successfully", newUser });
   } catch (error) {
     return res
       .status(500)
@@ -84,7 +85,6 @@ if (!user) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 
 export const fetchUsers = async (req, res) => {
   try {
