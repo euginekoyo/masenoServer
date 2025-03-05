@@ -79,7 +79,7 @@ if (!user) {
       process.env.JWT_SECRET, // Use env variable for security
       { expiresIn: "1h" }
     );
-    res.status(200).json({ message: "Login successful"});
+    res.status(200).json({ message: "Login successful",token});
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Server error", error: error.message });

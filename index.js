@@ -4,10 +4,9 @@ import cors from "cors";
 import path from "path";
 import morgan from "morgan"; // Import Morgan for logging
 import connectDB from "./config/db.js";
-import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
-import authRoutes from "./routes/authRoutes.js"; // Import auth routes
+import userRoutes from "./routes/userRoutes.js"; // Import auth routes
 
 const app = express();
 

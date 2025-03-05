@@ -90,8 +90,8 @@ export const createProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
   try {
-    // Implement filtering, sorting, and pagination
-    const {
+    // Extract and parse query parameters
+    let {
       page = 1,
       limit = 10,
       category,
@@ -102,32 +102,38 @@ export const getProducts = async (req, res) => {
       sortOrder = "desc",
     } = req.query;
 
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10;
+    minPrice = minPrice ? parseFloat(minPrice) : undefined;
+    maxPrice = maxPrice ? parseFloat(maxPrice) : undefined;
+
+    // Ensure valid page & limit
+    if (page < 1) page = 1;
+    if (limit < 1) limit = 10;
+
     // Build query object
     const query = {};
     if (category) query.category = category;
     if (brand) query.brand = brand;
-    if (minPrice || maxPrice) {
+    if (minPrice !== undefined || maxPrice !== undefined) {
       query.price = {};
-      if (minPrice) query.price.$gte = parseFloat(minPrice);
-      if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+      if (minPrice !== undefined) query.price.$gte = minPrice;
+      if (maxPrice !== undefined) query.price.$lte = maxPrice;
     }
 
     // Sort configuration
     const sort = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
 
-    // Pagination
+    // Pagination calculation
     const skip = (page - 1) * limit;
 
-    // Fetch products with pagination
-    const products = await Product.find(query)
-      .sort(sort)
-      .skip(skip)
-      .limit(Number(limit))
-      .select("-__v"); // Exclude version key
+    // Fetch products & total count simultaneously
+    const [products, total] = await Promise.all([
+      Product.find(query).sort(sort).skip(skip).limit(limit).select("-__v").exec(),
+      Product.countDocuments(query),
+    ]);
 
-    // Get total count for pagination metadata
-    const total = await Product.countDocuments(query);
-
+    // Send response
     return res.status(200).json({
       products,
       currentPage: page,
@@ -135,12 +141,14 @@ export const getProducts = async (req, res) => {
       totalProducts: total,
     });
   } catch (error) {
+    console.error("Error fetching products:", error);
     return res.status(500).json({
       message: "Error fetching products",
       error: error.message,
     });
   }
 };
+
 
 export const getProductById = async (req, res) => {
   try {
