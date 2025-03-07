@@ -27,10 +27,34 @@ export const createService = async (req, res) => {
 };
 
 export const getServices = async (req, res) => {
-  
   try {
-    const services = await Service.find();
-    return res.status(200).json(services);
+    let { page, limit, search, name } = req.query;
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10; // Default to 10 items per page
+
+    // Build search query
+    let query = {};
+    if (search) {
+      query.name = { $regex: search, $options: "i" }; // Case-insensitive search on 'name'
+    }
+    if (name) {
+      query.name = name; // Filter by name if provided
+    }
+
+    // Get total count for pagination
+    const totalServices = await Service.countDocuments(query);
+
+    // Fetch services with pagination
+    const services = await Service.find(query)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    return res.status(200).json({
+      data: services,
+      totalServices,
+      totalPages: Math.ceil(totalServices / limit),
+      currentPage: page,
+    });
   } catch (error) {
     return res
       .status(500)

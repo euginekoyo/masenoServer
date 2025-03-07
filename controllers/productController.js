@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 
 export const createProduct = async (req, res) => {
   try {
-
     const { title, description, price, phoneNumber, category, brand, stockQuantity } = req.body;
 
     // Validate required text fields
@@ -94,7 +93,7 @@ export const getProducts = async (req, res) => {
     let {
       page = 1,
       limit = 10,
-      category,
+      title,
       brand,
       minPrice,
       maxPrice,
@@ -113,7 +112,7 @@ export const getProducts = async (req, res) => {
 
     // Build query object
     const query = {};
-    if (category) query.category = category;
+    if (title) query.title = title;
     if (brand) query.brand = brand;
     if (minPrice !== undefined || maxPrice !== undefined) {
       query.price = {};
@@ -148,7 +147,6 @@ export const getProducts = async (req, res) => {
     });
   }
 };
-
 
 export const getProductById = async (req, res) => {
   try {
