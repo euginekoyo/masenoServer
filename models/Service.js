@@ -14,6 +14,10 @@ const serviceSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    category: {
+      type: String,
+      required: true,
+    },
     image: {
       type: String, // Store image URL or path
       required: true,
