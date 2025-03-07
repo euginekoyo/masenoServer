@@ -3,7 +3,7 @@ import cloudinary from "../config/cloudinary.js";
 
 // Create Service with Image Upload to Cloudinary
 export const createService = async (req, res) => {
-  const { name, description, price } = req.body;
+  const { name, description, price,category } = req.body;
   const imageUrl = req.file ? req.file.path : null; // Cloudinary returns file path as the image URL
 
   try {
@@ -11,6 +11,7 @@ export const createService = async (req, res) => {
       name,
       description,
       price,
+      category,
       image: imageUrl,
     });
 
@@ -57,12 +58,12 @@ export const getServiceById = async (req, res) => {
 export const updateService = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, price } = req.body;
+    const { name, description, price,category } = req.body;
     const imageUrl = req.file ? req.file.path : req.body.image;
 
     const updatedService = await Service.findByIdAndUpdate(
       id,
-      { name, description, price, image: imageUrl },
+      { name, description, price,category, image: imageUrl },
       { new: true, runValidators: true }
     );
 
