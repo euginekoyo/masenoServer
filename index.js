@@ -7,6 +7,7 @@ import connectDB from "./config/db.js";
 import productRoutes from "./routes/productRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
 import userRoutes from "./routes/userRoutes.js"; // Import auth routes
+import adminRoutes from "./routes/adminRoutes.js";
 
 const app = express();
 
@@ -32,6 +33,10 @@ app.use(
 app.use("/api/auth", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/services", serviceRoutes);
+
+// Admin routes
+
+app.use('/api/admin', adminRoutes);
 
 // Connect to MongoDB and Start Server
 connectDB()

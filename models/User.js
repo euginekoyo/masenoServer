@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
-const userSchema = new mongoose.Schema(
+
+const { Schema } = mongoose;
+
+const userSchema = new Schema(
   {
     name: {
       type: String,
@@ -17,8 +20,15 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
+      enum: ["buyer", "seller", "admin"],
       required: true,
       default: "buyer",
+
+    },
+    favorites: {
+      products: [{ type: Schema.Types.ObjectId, ref: "Product" }],
+      services: [{ type: Schema.Types.ObjectId, ref: "Service" }],
+
     },
   },
   {
